@@ -69,6 +69,10 @@ Attach a ```java InfiniteFireArray.OnLoadingStatusListener``` to receive loading
 Please note that these event only indicate when the inital sync is completed. 
 InfiniteFireArray will still receive real-time updates without dispatching further events after the inital sync.
 
+## How to install Infinite Fire
+
+Get it from [Jitpack](https://jitpack.io/#marcorei/Infinite-Fire/) via Gradle or Maven.
+
 ## Thanks
 - [FirebaseUI-Android library](https://github.com/firebase/FirebaseUI-Android) Inspiration for this library, uses an Array to connect Firebase to RecyclerViews
 - [Kato](https://twitter.com/katowulf) Great support, thank you!
