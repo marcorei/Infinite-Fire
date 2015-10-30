@@ -6,8 +6,8 @@ Inspired by the official [FirebaseUI-Android library](https://github.com/firebas
 
 ## Demo
 
-To run the demo you'll need a Firebase reference with chat messages similar to [FirebaseUI-Android](https://github.com/firebase/FirebaseUI-Android). 
-Enter the URL in the [string resource file](https://github.com/marcorei/Infinite-Fire/blob/master/app/src/main/res/values/strings.xml#L2).
+The demo uses the Firebase reference from [FirebaseUI-Android](https://github.com/firebase/FirebaseUI-Android). 
+You can enter your own Reference in the [string resource file](https://github.com/marcorei/Infinite-Fire/blob/master/app/src/main/res/values/strings.xml#L2).
 
 ## How to use Infinite Fire
 
