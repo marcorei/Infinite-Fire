@@ -4,6 +4,11 @@ A small library that helps you connecting Firebase to a RecyclerView.
 
 Inspired by the official [FirebaseUI-Android library](https://github.com/firebase/FirebaseUI-Android). 
 
+## Demo
+
+To run the demo you'll need a Firebase reference with chat messages similar to [FirebaseUI-Android](https://github.com/firebase/FirebaseUI-Android). 
+Enter the URL in the [string resource file](https://github.com/marcorei/Infinite-Fire/blob/master/app/src/main/res/values/strings.xml#L2).
+
 ## How to use Infinite Fire
 
 The core of Infinite Fire is the InfiniteFireArray.
