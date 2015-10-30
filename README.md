@@ -50,23 +50,23 @@ For more information take a look at the examples.
 ## Features
 
 ### Scroll-to-load-more.
-Use ```java InfiniteFireArray.more()``` to implement a scroll-to-load-more pattern. 
+Use ```InfiniteFireArray.more()``` to implement a scroll-to-load-more pattern. 
 It raises the limit of your Query incrementally.
 
 ### Pull-to-refresh.
 Firebase offers real-time functionality. 
-InfiniteFireArray uses the ```java Query.addChildEventListener()``` to keep your data up to date.
+InfiniteFireArray uses the ```Query.addChildEventListener()``` to keep your data up to date.
 
 There are use-cases though in which constantly changing the order of your items results in a really bad user experience. 
 Think about a grid view that is sorted by a value that changes a lot, e.g. a comments counter -- your view would look like a memory game.
 
-InfiniteFireArray allows you two maintain the order while still updating the existing items in real-time.
-Implementing a ```java SwipeRefreshLayout``` allows you to call ```java InfiniteArray.reset()``` to "reload" the data and set the limit of the Query to its orignial limit.
+InfiniteFireArray allows you to maintain the order while still updating the existing items in real-time.
+Implementing a ```SwipeRefreshLayout``` allows you to call ```InfiniteArray.reset()``` to "reload" the data and set the limit of the Query to its orignial limit.
 
 ### Loading events.
-Attach a ```java InfiniteFireArray.OnLoadingStatusListener``` to receive loading events. 
+Attach a ```InfiniteFireArray.OnLoadingStatusListener``` to receive loading events. 
 
-Please note that these event only indicate when the inital sync is completed. 
+Please note that these events only indicate when the inital sync is completed. 
 InfiniteFireArray will still receive real-time updates without dispatching further events after the inital sync.
 
 ## How to install Infinite Fire
