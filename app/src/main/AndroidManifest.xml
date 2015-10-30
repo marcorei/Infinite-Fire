@@ -1,0 +1,41 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.marcorei.infinitefiredemo">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="false"
+        android:name=".ui.InfiniteFireDemoApp"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.activity.InfiniteRecyclerViewLinearActivity"
+            android:label="@string/activity_linear_title"
+            android:windowSoftInputMode="adjustResize" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activity.InfiniteRecyclerViewLinearActivity" />
+        </activity>
+
+        <activity
+            android:name=".ui.activity.InfiniteRecyclerViewGridActivity"
+            android:label="@string/activity_grid_title"
+            android:windowSoftInputMode="adjustResize" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activity.InfiniteRecyclerViewGridActivity" />
+        </activity>
+    </application>
+
+</manifest>

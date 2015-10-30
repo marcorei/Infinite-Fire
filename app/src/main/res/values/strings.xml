@@ -1,0 +1,9 @@
+<resources>
+    <string name="firebase_base_url">[Enter URL here]</string>
+
+    <string name="app_name">Infinite Fire Demo</string>
+    <string name="activity_linear_title">Linear Demo</string>
+    <string name="activity_grid_title">Grid Demo</string>
+    <string name="button_label_send">Send</string>
+
+</resources>

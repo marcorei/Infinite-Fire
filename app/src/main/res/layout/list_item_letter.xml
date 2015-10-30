@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.marcorei.infinitefiredemo.ui.component.SquareFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#eee">
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"/>
+</com.marcorei.infinitefiredemo.ui.component.SquareFrameLayout>
