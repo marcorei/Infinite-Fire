@@ -271,9 +271,7 @@ public class InfiniteFireArray {
                 if(fixedItemPositions) {
                     return;
                 }
-                if(dataSnapshots.size() == 0) {
-                    notifyOnLoadingStatusListener();
-                }
+                boolean firstChild = (dataSnapshots.size() == 0);
 
                 if(eraseOnData) {
                     eraseOnData = false;
@@ -314,6 +312,9 @@ public class InfiniteFireArray {
                     }
                 }
                 dataSnapshots.add(i, dataSnapshot);
+                if(firstChild) {
+                    notifyOnLoadingStatusListener();
+                }
                 notifyOnChangedListener(OnChangedListener.EventType.Added, i);
             }
 
@@ -377,15 +378,10 @@ public class InfiniteFireArray {
                 }
                 loading = false;
                 refreshing = false;
-                notifyOnLoadingStatusListener();
-
                 if(!fixedItemPositions) {
+                    notifyOnLoadingStatusListener();
                     return;
                 }
-                if(dataSnapshots.size() == 0) {
-                    notifyOnLoadingStatusListener();
-                }
-
                 if(eraseOnData) {
                     eraseOnData = false;
                     dataSnapshots.clear();
@@ -426,6 +422,7 @@ public class InfiniteFireArray {
                         if(length > currentLimit) break;
                     }
                 }
+                notifyOnLoadingStatusListener();
             }
 
             @Override
