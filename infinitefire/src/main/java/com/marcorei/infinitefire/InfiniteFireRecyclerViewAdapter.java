@@ -4,7 +4,7 @@ package com.marcorei.infinitefire;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * This is an abstract Adapter on which you can base your own.
+ * This is an abstract {@link android.support.v7.widget.RecyclerView.Adapter Adapter} on which you can base your own.
  * It supports some convenience code but does neither marshal your data into types nor does it populate your view holders.
  */
 public abstract class InfiniteFireRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
@@ -14,11 +14,11 @@ public abstract class InfiniteFireRecyclerViewAdapter extends RecyclerView.Adapt
     protected int indexAppendix;
 
     /**
-     * Use this constructor if you got either multiple FirebaseInfiniteArrays that you want to merge into one RecyclerView or if you want to add custom headers or footer which will also get their data from firebase.
-     * This constructor does NOT add Listeners to anything, so you have to do that yourself.
+     * Use this constructor if you got either multiple InfiniteFireArrays that you want to merge into one RecyclerView or if you want to add custom headers or footers.
+     * This constructor does not add Listeners to anything, so you have to do that yourself.
      *
-     * @param numHeaders number of headers this RecyclerView adds to its length.
-     * @param numFooters number of footers this RecyclerView adds to its length.
+     * @param numHeaders Number of headers this RecyclerView adds to its length.
+     * @param numFooters Number of footers this RecyclerView adds to its length.
      */
     public InfiniteFireRecyclerViewAdapter(
             final int numHeaders,
@@ -29,12 +29,12 @@ public abstract class InfiniteFireRecyclerViewAdapter extends RecyclerView.Adapt
     }
 
     /**
-     * Use this constructor if you intent to use only one FirebaseInfinite with this Adapter.
-     * A listener will be added to snapshots.
+     * Use this constructor if you intent to use only one InfiniteFireArray with this Adapter.
+     * A {@link com.marcorei.infinitefire.InfiniteFireArray.OnChangedListener OnChangeListener} will be added to snapshots.
      *
-     * @param snapshots the single InfiniteFireArray from which tis adapter will get its data. If you want to use multiple Arrays, please use InfiniteFireRecyclerViewAdapter(numHeaders, numFooters)
-     * @param numHeaders number of headers this RecyclerView adds to its length.
-     * @param numFooters number of footers this RecyclerView adds to its length.
+     * @param snapshots The single InfiniteFireArray from which this Adapter will get its data. If you want to use multiple Arrays, use {@link InfiniteFireRecyclerViewAdapter#InfiniteFireRecyclerViewAdapter(int, int)}.
+     * @param numHeaders Number of headers this Adapter adds to its length.
+     * @param numFooters Number of footers this Adapter adds to its length.
      */
     public InfiniteFireRecyclerViewAdapter(
             InfiniteFireArray snapshots,
@@ -70,16 +70,26 @@ public abstract class InfiniteFireRecyclerViewAdapter extends RecyclerView.Adapt
         });
     }
 
+    /**
+     * Removes the Listener.
+     */
     public void clear() {
         snapshots.setOnChangedListener(null);
         snapshots = null;
     }
 
+    /**
+     * @return Get the item count including headers and footers.
+     */
     @Override
     public int getItemCount() {
         return snapshots.getCount() + indexOffset + indexAppendix;
     }
 
+    /**
+     * @param position Position of the item.
+     * @return Position of the item because there are headers and footers for which we can't get a proper hash code.
+     */
     @Override
     public long getItemId(int position) {
         return position;

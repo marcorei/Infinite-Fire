@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * This class implements an array-like collection based on a firebase query.
- * It supports pull-to-refresh and load-more.
- * It also dispatches loading events for every initial loading procedure which is triggered by changing or modifying th inital query.
+ * This class implements an array-like collection based on a {@link Query}.
+ * It supports {@link #reset() pull-to-refresh} and {@link #more() load-more}.
+ * It also dispatches loading events for the initial loading procedure and when using {@link #more()} or {@link #reset()}.
  */
 public class InfiniteFireArray {
 
@@ -20,23 +20,23 @@ public class InfiniteFireArray {
      * This Event is dispatched when data in the array changes.
      */
     public interface OnChangedListener {
-        enum EventType { Added, Changed, Removed, Moved, Reset }
+        enum EventType {Added, Changed, Removed, Moved, Reset}
         void onChanged(EventType type, int index, int oldIndex);
     }
 
     /**
-     * Observe initial loading state changes.
-     * Please note that this is only relevant for _initial_ loading states.
-     * Since firebase is real-time, loading will never finish until the array is cleared, even if "Done" is dispatched.
+     * Observe loading state changes.
+     * Please note that Firebase is real-time and loading will never finish until the array is cleared, even if EventType.Done is dispatched.
+     * The events dispatched here are only for the initial sync-process and when using {@link #more() more()} or {@link #reset() reset()}.
      */
     public interface OnLoadingStatusListener {
-        enum EventType { LoadingNoContent, LoadingContent, Done}
+        enum EventType {LoadingNoContent, LoadingContent, Done}
         void onChanged(EventType type);
     }
 
     /**
-     * This event is dispatched in case of a firebase error.
-     * If this event is dispatched the array will be cleared.
+     * This event is dispatched in case of a Firebase error.
+     * If this event is dispatched the InfiniteFireArray will be cleared.
      */
     public interface OnFirebaseErrorListener {
         void onFirebaseError(FirebaseError firebaseError);
@@ -63,12 +63,11 @@ public class InfiniteFireArray {
     private ArrayList<OnLoadingStatusListener> onLoadingStatusListeners = new ArrayList<OnLoadingStatusListener>();
 
     /**
-     *
-     * @param query do not limit this query, order it though
-     * @param initialSize size of the initial limit
-     * @param pageSize size of limit raises
-     * @param limitToFirst set false if the list order should be reversed
-     * @param fixedItemPositions set true if you want the array not to change item positions. can be useful with grid layouts.
+     * @param query Firebase reference oder Query. You can order the Query. Do not limit this Query using {@link Query#limitToFirst(int)} or {@link Query#limitToLast(int)}.
+     * @param initialSize Size of the initial limit. InfiniteFireArray will limit your query using this value.
+     * @param pageSize Size of incremental limit increase when calling {@link #more()}
+     * @param limitToFirst Set to false to reverse the order of the Query. When false InfiniteFireArray will use {@link Query#limitToLast(int)} instead of {@link Query#limitToFirst(int)}.
+     * @param fixedItemPositions When true InfiniteFireArray will maintain item positions. {@link ChildEventListener#onChildAdded(DataSnapshot, String) onChildAdded} and {@link ChildEventListener#onChildMoved(DataSnapshot, String)} events will be ignored if necessary to maintain the order.
      */
     public InfiniteFireArray(Query query, int initialSize, int pageSize, boolean limitToFirst, boolean fixedItemPositions) {
         this.originalQuery = query;
@@ -80,7 +79,7 @@ public class InfiniteFireArray {
     }
 
     /**
-     * Reload the initial query
+     * Reset the limit of the Query to the initial page size.
      */
     public void reset() {
         cleanupCurrentQuery();
@@ -91,16 +90,15 @@ public class InfiniteFireArray {
         // so resetting should at this point should not be too bad.
 
         eraseOnData = true;
-
         loading = true;
         refreshing = true;
         notifyOnLoadingStatusListener();
-
         setupCurrentQuery();
     }
 
     /**
-     * Raise the initial limit and load the new query.
+     * Incrementally increase the limit of the Query by one page.
+     * Calling more while loading will be ignored.
      */
     public void more() {
         // we do not want to raise the limit if end of data is reached.
@@ -112,13 +110,10 @@ public class InfiniteFireArray {
         if(loading) {
             return;
         }
-
         cleanupCurrentQuery();
         currentLimit += pageSize;
-
         loading = true;
         notifyOnLoadingStatusListener();
-
         setupCurrentQuery();
     }
 
@@ -131,46 +126,74 @@ public class InfiniteFireArray {
 
     /**
      * Use with caution!
-     * Remove an item from the array without receiving a firebase event first.
-     * @param index index of the item that will be removed
+     * Remove an item from the array without receiving a Firebase event first.
+     * @param index Index of the item that will be removed.
      */
     public void forceRemoveItemAt(int index) {
         dataSnapshots.remove(index);
         notifyOnChangedListener(OnChangedListener.EventType.Removed, index);
     }
 
+    /**
+     * @return Is false when the initial sync procedure has been completed. Will be true if {@link #more()} or {@link #reset()} sync procedures are active.
+     */
     public boolean isLoading() {
         return loading;
     }
 
+    /**
+     * @return Is true only if the initial sync procedure or the {@link #reset()} sync procedure is active.
+     */
     public boolean isRefreshing() {
         return refreshing;
     }
 
+    /**
+     * @param position Position of the item in the array.
+     * @return Raw DataSnapshot.
+     */
     public DataSnapshot getItem(int position) {
         return dataSnapshots.get(position);
     }
 
+    /**
+     * @return If true calling {@link #more()} will increase the size of the Query.
+     */
     public boolean hasMoreData() {
         return !endOfDataReached;
     }
 
+    /**
+     * @return Size of the InfiniteFireArray.
+     */
     public int getCount() {
         return dataSnapshots.size();
     }
 
+    /**
+     * @param onChangedListener Listener for change events.
+     */
     public void setOnChangedListener(OnChangedListener onChangedListener) {
         this.onChangedListener = onChangedListener;
     }
 
+    /**
+     * @param onFirebaseErrorListener Listener for error events.
+     */
     public void setOnFirebaseErrorListener(OnFirebaseErrorListener onFirebaseErrorListener) {
         this.onFirebaseErrorListener = onFirebaseErrorListener;
     }
 
+    /**
+     * @param onLoadingStatusListener Listener for loading events.
+     */
     public void addOnLoadingStatusListener(OnLoadingStatusListener onLoadingStatusListener) {
         onLoadingStatusListeners.add(onLoadingStatusListener);
     }
 
+    /**
+     * @param onLoadingStatusListener listener for loading events to remove.
+     */
     public void removeOnLoadingStatusListener(OnLoadingStatusListener onLoadingStatusListener) {
         Iterator i = onLoadingStatusListeners.iterator();
         while( i.hasNext() ) {
@@ -179,7 +202,6 @@ public class InfiniteFireArray {
             }
         }
     }
-
 
     private int getIndexForKey(String key) {
         int i = 0;
@@ -193,9 +215,9 @@ public class InfiniteFireArray {
         return -1;
     }
 
-    // ---------------------
-    // Listener notify fns
-    // ---------------------
+    // --------------------------
+    // Listener notify
+    // --------------------------
 
     private void notifyOnChangedListener(OnChangedListener.EventType type) {
         notifyOnChangedListener(type, -1, -1);
@@ -236,9 +258,9 @@ public class InfiniteFireArray {
         }
     }
 
-    // ---------------------
-    // Query setup and cleanup fns
-    // ---------------------
+    // --------------------------
+    // Query setup and cleanup
+    // --------------------------
 
     private void setupCurrentQuery() {
         if(limitToFirst) {
@@ -272,42 +294,33 @@ public class InfiniteFireArray {
                     return;
                 }
                 boolean firstChild = (dataSnapshots.size() == 0);
-
                 if(eraseOnData) {
                     eraseOnData = false;
                     dataSnapshots.clear();
                     notifyOnChangedListener(OnChangedListener.EventType.Reset);
                 }
                 int i;
-                if(previousChild != null) {
-                    if(limitToFirst) {
+                if(limitToFirst) {
+                    if(previousChild != null) {
                         i = getIndexForKey(previousChild) + 1;
-                    }
-                    else {
-                        // when limit to last is active we want to reverse the order of the children!
-                        // so that we can reverse the order again in the layout manager :S
-                        i = getIndexForKey(previousChild);
-                    }
-                }
-                else {
-                    if(limitToFirst) {
+                    } else {
                         i = 0;
                     }
-                    else {
-                        i = dataSnapshots.size();
-                    }
-                }
-
-                if(limitToFirst) {
-                    if(dataSnapshots.size() >= (i + 1)
-                            && dataSnapshots.get(i).getKey().equals(dataSnapshot.getKey())) {
+                    if(dataSnapshots.size() >= (i + 1) &&
+                            dataSnapshots.get(i).getKey().equals(dataSnapshot.getKey())) {
                         return;
                     }
-                }
-                else {
-                    if(i > 0
-                            && i < dataSnapshots.size() + 1
-                            && dataSnapshots.get(i - 1).getKey().equals(dataSnapshot.getKey())) {
+                } else {
+                    if(previousChild != null) {
+                        // when limit to last is active we want to reverse the order of the children!
+                        // so that we can reverse the order again in the LayoutManager.
+                        i = getIndexForKey(previousChild);
+                    } else {
+                        i = dataSnapshots.size();
+                    }
+                    if(i > 0 &&
+                            i < dataSnapshots.size() + 1 &&
+                            dataSnapshots.get(i - 1).getKey().equals(dataSnapshot.getKey())) {
                         return;
                     }
                 }
@@ -321,7 +334,9 @@ public class InfiniteFireArray {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 int i = getIndexForKey(dataSnapshot.getKey());
-                if(i == -1) return;
+                if(i == -1) {
+                    return;
+                }
                 dataSnapshots.set(i, dataSnapshot);
                 notifyOnChangedListener(OnChangedListener.EventType.Changed, i);
             }
@@ -331,7 +346,6 @@ public class InfiniteFireArray {
                 if(fixedItemPositions) {
                     return;
                 }
-
                 int i = getIndexForKey(dataSnapshot.getKey());
                 if(i == -1) {
                     return;
@@ -345,13 +359,12 @@ public class InfiniteFireArray {
                 if(fixedItemPositions) {
                     return;
                 }
-
                 int oldIndex = getIndexForKey(dataSnapshot.getKey());
                 if(oldIndex == -1) {
                     return;
                 }
                 dataSnapshots.remove(oldIndex);
-                int newIndex = s == null ? 0 : (getIndexForKey(s) + 1);
+                int newIndex = (s == null) ? 0 : (getIndexForKey(s) + 1);
                 dataSnapshots.add(newIndex, dataSnapshot);
                 notifyOnChangedListener(OnChangedListener.EventType.Moved, newIndex, oldIndex);
             }
@@ -373,7 +386,7 @@ public class InfiniteFireArray {
                 if(childrenCount < currentLimit) {
                     // this event will always be fired after child added events
                     // it will also include all children within the current limit thanks to the event promises.
-                    currentLimit = (int) (long) childrenCount;
+                    currentLimit = (int) childrenCount;
                     endOfDataReached = true;
                 }
                 loading = false;
@@ -395,13 +408,10 @@ public class InfiniteFireArray {
                         if(i > -1) continue;
                         dataSnapshots.add(child);
                         notifyOnChangedListener(OnChangedListener.EventType.Added, length -1);
-
                         length++;
-
                         // this is to ensure that we never add more items then there should be
                         // which in some cases might be the case in a fixed array (without position changes)
                         // if the firebase data underneath changes too much.
-
                         if(length > currentLimit) break;
                     }
                 }
