@@ -1,5 +1,7 @@
+/* (c) 2015 Markus Riegel
+ * license: MIT
+ */
 package com.marcorei.infinitefire;
-
 
 import android.support.v7.widget.RecyclerView;
 

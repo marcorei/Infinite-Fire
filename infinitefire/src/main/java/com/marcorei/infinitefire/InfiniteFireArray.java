@@ -1,3 +1,6 @@
+/* (c) 2015 Markus Riegel
+ * license: MIT
+ */
 package com.marcorei.infinitefire;
 
 import com.firebase.client.ChildEventListener;
