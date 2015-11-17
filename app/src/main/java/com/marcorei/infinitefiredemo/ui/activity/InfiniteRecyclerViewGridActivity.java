@@ -38,7 +38,7 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
 
     public static final String TAG = InfiniteRecyclerViewGridActivity.class.getSimpleName();
 
-    InfiniteFireArray array;
+    InfiniteFireArray<Chat> array;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,8 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
         // setup for the firebase array, wiring to the adapter and view
 
         final Query query = ref.orderByKey();
-        array = new InfiniteFireArray(
+        array = new InfiniteFireArray<>(
+                Chat.class,
                 query,
                 18,
                 18,
@@ -252,7 +253,7 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
                 case VIEW_TYPE_CONTENT:
                     Chat chat;
                     try {
-                        chat = snapshots.getItem(position - indexOffset).getValue(Chat.class);
+                        chat = (Chat) snapshots.getItem(position - indexOffset);
                     }
                     catch(FirebaseException exception) {
                         System.err.println("Marshall Failed: " + exception.getMessage());

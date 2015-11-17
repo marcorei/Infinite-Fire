@@ -7,11 +7,10 @@ import android.support.v7.widget.RecyclerView;
 
 /**
  * This is an abstract {@link android.support.v7.widget.RecyclerView.Adapter Adapter} on which you can base your own.
- * It supports some convenience code but does neither marshal your data into types nor does it populate your view holders.
  */
 public abstract class InfiniteFireRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    protected InfiniteFireArray snapshots;
+    protected InfiniteFireArray<?> snapshots;
     protected int indexOffset;
     protected int indexAppendix;
 
@@ -39,7 +38,7 @@ public abstract class InfiniteFireRecyclerViewAdapter extends RecyclerView.Adapt
      * @param numFooters Number of footers this Adapter adds to its length.
      */
     public InfiniteFireRecyclerViewAdapter(
-            InfiniteFireArray snapshots,
+            InfiniteFireArray<?> snapshots,
             final int numHeaders,
             final int numFooters) {
         this.snapshots = snapshots;
