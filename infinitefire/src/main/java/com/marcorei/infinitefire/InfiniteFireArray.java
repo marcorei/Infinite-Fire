@@ -17,6 +17,7 @@ import java.util.Iterator;
  * This class implements an array-like collection based on a {@link Query}.
  * It supports {@link #reset() pull-to-refresh} and {@link #more() load-more}.
  * It also dispatches loading events for the initial loading procedure and when using {@link #more()} or {@link #reset()}.
+ * It returns generically typed {@link InfiniteFireSnapshot}s so you can replace it for testing.
  */
 public class InfiniteFireArray<T> {
 
@@ -156,11 +157,18 @@ public class InfiniteFireArray<T> {
 
     /**
      * @param position Position of the item in the array.
-     * @return Typed item.
-     * @throws FirebaseException
+     * @return A snapshot with the key and the typed value.
      */
-    public T getItem(int position) throws FirebaseException{
-        return dataSnapshots.get(position).getValue(ItemClass);
+    public InfiniteFireSnapshot<T> getItem(int position) {
+        DataSnapshot dataSnapshot = dataSnapshots.get(position);
+        T value;
+        try {
+            value = dataSnapshot.getValue(ItemClass);
+        }
+        catch(FirebaseException exception) {
+            value = null;
+        }
+        return new InfiniteFireSnapshot<>(dataSnapshot.getKey(), value);
     }
 
     /**
