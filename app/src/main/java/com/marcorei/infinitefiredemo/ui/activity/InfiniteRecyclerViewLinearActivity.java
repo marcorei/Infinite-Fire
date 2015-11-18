@@ -134,7 +134,7 @@ public class InfiniteRecyclerViewLinearActivity extends AppCompatActivity{
      * The adapter in this example holds the logic how to convert snapshots into pojos.
      * It also inflates the layout resources.
      */
-    public static class RecyclerViewAdapter extends InfiniteFireRecyclerViewAdapter {
+    public static class RecyclerViewAdapter extends InfiniteFireRecyclerViewAdapter<Chat> {
 
         public static final int VIEW_TYPE_HEADER = 0;
         public static final int VIEW_TYPE_CONTENT = 1;
@@ -255,12 +255,8 @@ public class InfiniteRecyclerViewLinearActivity extends AppCompatActivity{
             int viewType = getItemViewType(position);
             switch(viewType) {
                 case VIEW_TYPE_CONTENT:
-                    Chat chat;
-                    try {
-                        chat = (Chat) snapshots.getItem(position - indexOffset);
-                    }
-                    catch(FirebaseException exception) {
-                        System.err.println("Marshall Failed: " + exception.getMessage());
+                    Chat chat = snapshots.getItem(position - indexOffset).getValue();
+                    if(chat == null) {
                         chat = new Chat("N/A","N/A");
                     }
                     ChatHolder contentHolder = (ChatHolder) holder;
