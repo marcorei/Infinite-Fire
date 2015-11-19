@@ -218,7 +218,11 @@ public class InfiniteFireArray<T> {
         }
     }
 
-    private int getIndexForKey(String key) {
+    /**
+     * @param key InfinitFireSnapshot key.
+     * @return position of the InfiniteFireSnapshot in the array. -1 if not found.
+     */
+    public int getIndexForKey(String key) {
         int i = 0;
         for (DataSnapshot snapshot : dataSnapshots) {
             if (snapshot.getKey().equals(key)) {
