@@ -6,6 +6,7 @@ package com.marcorei.infinitefire;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.FirebaseException;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 
@@ -16,8 +17,9 @@ import java.util.Iterator;
  * This class implements an array-like collection based on a {@link Query}.
  * It supports {@link #reset() pull-to-refresh} and {@link #more() load-more}.
  * It also dispatches loading events for the initial loading procedure and when using {@link #more()} or {@link #reset()}.
+ * It returns generically typed {@link InfiniteFireSnapshot}s so you can replace it for testing.
  */
-public class InfiniteFireArray {
+public class InfiniteFireArray<T> {
 
     /**
      * This Event is dispatched when data in the array changes.
@@ -45,6 +47,7 @@ public class InfiniteFireArray {
         void onFirebaseError(FirebaseError firebaseError);
     }
 
+    private Class<T> ItemClass;
     private Query originalQuery;
     private Query currentQuery;
     private ChildEventListener childEventListener;
@@ -72,7 +75,8 @@ public class InfiniteFireArray {
      * @param limitToFirst Set to false to reverse the order of the Query. When false InfiniteFireArray will use {@link Query#limitToLast(int)} instead of {@link Query#limitToFirst(int)}.
      * @param fixedItemPositions When true InfiniteFireArray will maintain item positions. {@link ChildEventListener#onChildAdded(DataSnapshot, String) onChildAdded} and {@link ChildEventListener#onChildMoved(DataSnapshot, String)} events will be ignored if necessary to maintain the order.
      */
-    public InfiniteFireArray(Query query, int initialSize, int pageSize, boolean limitToFirst, boolean fixedItemPositions) {
+    public InfiniteFireArray(Class<T> ItemClass, Query query, int initialSize, int pageSize, boolean limitToFirst, boolean fixedItemPositions) {
+        this.ItemClass = ItemClass;
         this.originalQuery = query;
         this.initialSize = initialSize;
         this.pageSize = pageSize;
@@ -153,10 +157,18 @@ public class InfiniteFireArray {
 
     /**
      * @param position Position of the item in the array.
-     * @return Raw DataSnapshot.
+     * @return A snapshot with the key and the typed value.
      */
-    public DataSnapshot getItem(int position) {
-        return dataSnapshots.get(position);
+    public InfiniteFireSnapshot<T> getItem(int position) {
+        DataSnapshot dataSnapshot = dataSnapshots.get(position);
+        T value;
+        try {
+            value = dataSnapshot.getValue(ItemClass);
+        }
+        catch(FirebaseException exception) {
+            value = null;
+        }
+        return new InfiniteFireSnapshot<>(dataSnapshot.getKey(), value);
     }
 
     /**
@@ -206,7 +218,11 @@ public class InfiniteFireArray {
         }
     }
 
-    private int getIndexForKey(String key) {
+    /**
+     * @param key InfinitFireSnapshot key.
+     * @return position of the InfiniteFireSnapshot in the array. -1 if not found.
+     */
+    public int getIndexForKey(String key) {
         int i = 0;
         for (DataSnapshot snapshot : dataSnapshots) {
             if (snapshot.getKey().equals(key)) {

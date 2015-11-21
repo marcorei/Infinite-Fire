@@ -35,7 +35,7 @@ public class InfiniteRecyclerViewLinearActivity extends AppCompatActivity{
 
     public static final String TAG = InfiniteRecyclerViewGridActivity.class.getSimpleName();
 
-    InfiniteFireArray array;
+    InfiniteFireArray<Chat> array;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,8 @@ public class InfiniteRecyclerViewLinearActivity extends AppCompatActivity{
         // setup for the firebase array, wiring to the adapter and view
 
         final Query query = ref.orderByKey();
-        array = new InfiniteFireArray(
+        array = new InfiniteFireArray<>(
+                Chat.class,
                 query,
                 20,
                 20,
@@ -133,7 +134,7 @@ public class InfiniteRecyclerViewLinearActivity extends AppCompatActivity{
      * The adapter in this example holds the logic how to convert snapshots into pojos.
      * It also inflates the layout resources.
      */
-    public static class RecyclerViewAdapter extends InfiniteFireRecyclerViewAdapter {
+    public static class RecyclerViewAdapter extends InfiniteFireRecyclerViewAdapter<Chat> {
 
         public static final int VIEW_TYPE_HEADER = 0;
         public static final int VIEW_TYPE_CONTENT = 1;
@@ -254,12 +255,8 @@ public class InfiniteRecyclerViewLinearActivity extends AppCompatActivity{
             int viewType = getItemViewType(position);
             switch(viewType) {
                 case VIEW_TYPE_CONTENT:
-                    Chat chat;
-                    try {
-                        chat = snapshots.getItem(position - indexOffset).getValue(Chat.class);
-                    }
-                    catch(FirebaseException exception) {
-                        System.err.println("Marshall Failed: " + exception.getMessage());
+                    Chat chat = snapshots.getItem(position - indexOffset).getValue();
+                    if(chat == null) {
                         chat = new Chat("N/A","N/A");
                     }
                     ChatHolder contentHolder = (ChatHolder) holder;

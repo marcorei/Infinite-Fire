@@ -38,7 +38,7 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
 
     public static final String TAG = InfiniteRecyclerViewGridActivity.class.getSimpleName();
 
-    InfiniteFireArray array;
+    InfiniteFireArray<Chat> array;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,8 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
         // setup for the firebase array, wiring to the adapter and view
 
         final Query query = ref.orderByKey();
-        array = new InfiniteFireArray(
+        array = new InfiniteFireArray<>(
+                Chat.class,
                 query,
                 18,
                 18,
@@ -153,7 +154,7 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
      * The adapter in this example holds the logic how to convert snapshots into pojos.
      * It also inflates the layout resources.
      */
-    public static class RecyclerViewAdapter extends InfiniteFireRecyclerViewAdapter {
+    public static class RecyclerViewAdapter extends InfiniteFireRecyclerViewAdapter<Chat> {
 
         public static final int VIEW_TYPE_CONTENT = 1;
         public static final int VIEW_TYPE_FOOTER = 2;
@@ -250,12 +251,8 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
             int viewType = getItemViewType(position);
             switch(viewType) {
                 case VIEW_TYPE_CONTENT:
-                    Chat chat;
-                    try {
-                        chat = snapshots.getItem(position - indexOffset).getValue(Chat.class);
-                    }
-                    catch(FirebaseException exception) {
-                        System.err.println("Marshall Failed: " + exception.getMessage());
+                    Chat chat = snapshots.getItem(position - indexOffset).getValue();
+                    if(chat == null) {
                         chat = new Chat("-","-");
                     }
                     LetterHolder contentHolder = (LetterHolder) holder;
