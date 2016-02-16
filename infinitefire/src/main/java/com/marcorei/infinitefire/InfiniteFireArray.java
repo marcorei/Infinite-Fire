@@ -343,6 +343,16 @@ public class InfiniteFireArray<T> {
                         return;
                     }
                 }
+
+                // when previousChild is not supplied this child is supposed to be the first child.
+                // unfortunately this is not always true: when added a new child locally, then
+                // previousChild might as well be null for multiple children (the first on and the new one).
+                // so we need to check the whole array for duplicates.
+                if(previousChild == null &&
+                        getIndexForKey(dataSnapshot.getKey()) != -1) {
+                    return;
+                }
+
                 dataSnapshots.add(i, dataSnapshot);
                 if(firstChild) {
                     notifyOnLoadingStatusListener();
