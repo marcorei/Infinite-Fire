@@ -361,7 +361,7 @@ public class InfiniteFireArray<T> {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String previousChild) {
                 int i = getIndexForKey(dataSnapshot.getKey());
                 if(i == -1) {
                     return;
@@ -384,7 +384,7 @@ public class InfiniteFireArray<T> {
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChild) {
                 if(fixedItemPositions) {
                     return;
                 }
@@ -393,7 +393,13 @@ public class InfiniteFireArray<T> {
                     return;
                 }
                 dataSnapshots.remove(oldIndex);
-                int newIndex = (s == null) ? 0 : (getIndexForKey(s) + 1);
+                int newIndex;
+                if(limitToFirst) {
+                    newIndex = (previousChild == null) ? 0 : (getIndexForKey(previousChild) + 1);
+                }
+                else {
+                    newIndex = (previousChild == null) ? dataSnapshots.size() : (getIndexForKey(previousChild));
+                }
                 dataSnapshots.add(newIndex, dataSnapshot);
                 notifyOnChangedListener(OnChangedListener.EventType.Moved, newIndex, oldIndex);
             }
