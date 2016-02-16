@@ -343,6 +343,16 @@ public class InfiniteFireArray<T> {
                         return;
                     }
                 }
+
+                // when previousChild is not supplied this child is supposed to be the first child.
+                // unfortunately this is not always true: when added a new child locally, then
+                // previousChild might as well be null for multiple children (the first on and the new one).
+                // so we need to check the whole array for duplicates.
+                if(previousChild == null &&
+                        getIndexForKey(dataSnapshot.getKey()) != -1) {
+                    return;
+                }
+
                 dataSnapshots.add(i, dataSnapshot);
                 if(firstChild) {
                     notifyOnLoadingStatusListener();
@@ -351,7 +361,7 @@ public class InfiniteFireArray<T> {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String previousChild) {
                 int i = getIndexForKey(dataSnapshot.getKey());
                 if(i == -1) {
                     return;
@@ -374,7 +384,7 @@ public class InfiniteFireArray<T> {
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChild) {
                 if(fixedItemPositions) {
                     return;
                 }
@@ -383,7 +393,13 @@ public class InfiniteFireArray<T> {
                     return;
                 }
                 dataSnapshots.remove(oldIndex);
-                int newIndex = (s == null) ? 0 : (getIndexForKey(s) + 1);
+                int newIndex;
+                if(limitToFirst) {
+                    newIndex = (previousChild == null) ? 0 : (getIndexForKey(previousChild) + 1);
+                }
+                else {
+                    newIndex = (previousChild == null) ? dataSnapshots.size() : (getIndexForKey(previousChild));
+                }
                 dataSnapshots.add(newIndex, dataSnapshot);
                 notifyOnChangedListener(OnChangedListener.EventType.Moved, newIndex, oldIndex);
             }
