@@ -15,10 +15,11 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.FirebaseException;
-import com.firebase.client.Query;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseException;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.marcorei.infinitefire.InfiniteFireArray;
 import com.marcorei.infinitefire.InfiniteFireRecyclerViewAdapter;
 import com.marcorei.infinitefiredemo.R;
@@ -45,8 +46,7 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo_grid);
 
-        final Firebase ref = new Firebase(getResources().getString(R.string.firebase_base_url));
-
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("chat");
 
         // setup for the text input area
 
@@ -59,9 +59,9 @@ public class InfiniteRecyclerViewGridActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Chat chat = new Chat(name, editText.getText().toString());
                 buttonSend.setEnabled(false);
-                ref.push().setValue(chat, new Firebase.CompletionListener() {
+                ref.push().setValue(chat, new DatabaseReference.CompletionListener() {
                     @Override
-                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                    public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                         if (firebaseError != null) {
                             Log.d(TAG, "firebase error", firebaseError.toException());
                         }

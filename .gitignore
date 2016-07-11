@@ -36,3 +36,4 @@ proguard/
 
 # Fix for jdk version mismatches
 .idea/
+app/google-services.json

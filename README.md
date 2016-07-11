@@ -6,8 +6,26 @@ Inspired by the official [FirebaseUI-Android library](https://github.com/firebas
 
 ## Demo
 
-The demo uses the Firebase reference from [FirebaseUI-Android](https://github.com/firebase/FirebaseUI-Android). 
-You can enter your own Reference in the [string resource file](https://github.com/marcorei/Infinite-Fire/blob/master/app/src/main/res/values/strings.xml#L2).
+Add your own google-services.json to the app folder to run the demo app!
+Use the following rules for your database:
+```json
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "chat": {
+      ".read": "true",
+      "$chat": {
+        ".write": "true",
+        ".validate": "newData.hasChildren(['name', 'text'])",
+        "name": {".validate": "true"},
+        "text": {".validate": "true"},
+        "$other": {".validate": "false"}
+      }
+    }
+  }
+}
+```
 
 ## How to use Infinite Fire
 

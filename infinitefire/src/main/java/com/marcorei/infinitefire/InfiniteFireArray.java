@@ -3,12 +3,12 @@
  */
 package com.marcorei.infinitefire;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.FirebaseException;
-import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseException;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,7 +44,7 @@ public class InfiniteFireArray<T> {
      * If this event is dispatched the InfiniteFireArray will be cleared.
      */
     public interface OnFirebaseErrorListener {
-        void onFirebaseError(FirebaseError firebaseError);
+        void onFirebaseError(DatabaseError firebaseError);
     }
 
     private Class<T> ItemClass;
@@ -165,7 +165,7 @@ public class InfiniteFireArray<T> {
         try {
             value = dataSnapshot.getValue(ItemClass);
         }
-        catch(FirebaseException exception) {
+        catch(DatabaseException exception) {
             value = null;
         }
         return new InfiniteFireSnapshot<>(dataSnapshot.getKey(), value);
@@ -271,7 +271,7 @@ public class InfiniteFireArray<T> {
         }
     }
 
-    private void notifyOnFirebaseErrorListener(FirebaseError firebaseError) {
+    private void notifyOnFirebaseErrorListener(DatabaseError firebaseError) {
         if (onFirebaseErrorListener != null) {
             onFirebaseErrorListener.onFirebaseError(firebaseError);
         }
@@ -405,7 +405,7 @@ public class InfiniteFireArray<T> {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
                 cleanup();
                 notifyOnFirebaseErrorListener(firebaseError);
             }
@@ -471,7 +471,7 @@ public class InfiniteFireArray<T> {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
                 cleanup();
                 notifyOnFirebaseErrorListener(firebaseError);
             }
