@@ -1,3 +1,7 @@
+**⚠️ This project is no longer maintained ⚠️**
+
+***
+
 # Infinite Fire
 
 A small library that helps you connecting Firebase to a RecyclerView.
